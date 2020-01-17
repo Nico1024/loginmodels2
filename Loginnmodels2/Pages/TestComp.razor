@@ -1,0 +1,141 @@
+﻿@page "/testcomp"
+@using Loginnmodels2.Data
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.CompilerServices
+
+@typeparam TItem
+
+@inject HttpClient http;
+@inject NavigationManager navigationManager;
+
+
+<h3>Component1</h3>
+
+<EditForm Model="@Context" OnValidSubmit="@(() => OnClick.InvokeAsync(Context))">
+    @foreach (var field in ObjectProperties)
+    {
+        @field.Key
+        @field.Value
+        @switch (field.Value)
+        {
+            case "System.String":@CreateStringComponent(field.Key); break;
+        case "System.Int32":@CreateInt32Component(field.Key); break;
+    case "System.Int64":@CreateInt32Component(field.Key); break;
+case "System.Boolean":@CreateBoolComponent(field.Key); break;
+
+}
+        if (field.Value.Contains("System.Collections"))
+        {<p>lista</p>;
+        }
+
+        <br />
+    }
+
+
+    <button type="submit">Submit</button>
+</EditForm>
+
+    @code
+            {
+        //[Parameter] public DataX DataContext { get; set; }
+        //[Parameter] public Dictionary<string, string> FieldIdentifiers { get; set; } = new Dictionary<string, string> { { "Name", "string" }, { "Phone", "string" } };
+
+
+                [Parameter] public TItem Context { get; set; }
+            [Parameter] public EventCallback<TItem> OnClick { get; set; }
+
+
+            public Dictionary<string, string> ObjectProperties = new Dictionary<string, string>();
+
+            protected override void OnInitialized()
+            {
+                base.OnInitialized();
+                foreach (var item in typeof(TItem).GetProperties())
+                {
+                    ObjectProperties.Add(item.Name, item.PropertyType.ToString());
+                }
+            }
+            public int count = 0;
+
+            public string message;
+
+
+
+            public RenderFragment CreateStringComponent(string fld) => builder =>
+            {
+                builder.OpenComponent(0, typeof(InputText));
+
+                // Get the initial property value
+                var propInfoValue = typeof(TItem).GetProperty(fld);
+                var s = propInfoValue.GetValue(Context);
+                builder.AddAttribute(1, "Value", s);
+
+                // Create the handler for ValueChanged. I use reflection to the value.
+                builder.AddAttribute(3, "ValueChanged",
+                                RuntimeHelpers.TypeCheck<EventCallback<System.String>>
+                                (EventCallback.Factory.Create<System.String>(this,
+                                EventCallback.Factory.CreateInferred(this,
+                                __value => propInfoValue.SetValue(Context, __value), (string)propInfoValue.GetValue(Context)))));
+
+                // Create an expression to set the ValueExpression-attribute.
+                var constant = System.Linq.Expressions.Expression.Constant(Context, typeof(TItem));
+                var exp = System.Linq.Expressions.MemberExpression.Property(constant, fld);
+                var lamb = System.Linq.Expressions.Expression.Lambda<Func<string>>(exp);
+
+                builder.AddAttribute(4, "ValueExpression", lamb);
+
+                builder.CloseComponent();
+            };
+
+            public RenderFragment CreateInt32Component(string fld) => builder =>
+            {
+                builder.OpenComponent(0, typeof(InputNumber<Int32>));
+
+                // Get the initial property value
+                var propInfoValue = typeof(TItem).GetProperty(fld);
+                var s = propInfoValue.GetValue(Context);
+                builder.AddAttribute(1, "Value", s);
+
+                // Create the handler for ValueChanged. I use reflection to the value.
+                builder.AddAttribute(3, "ValueChanged",
+                                RuntimeHelpers.TypeCheck<EventCallback<System.Int32>>
+                                (EventCallback.Factory.Create<System.Int32>(this,
+                                EventCallback.Factory.CreateInferred(this,
+                                __value => propInfoValue.SetValue(Context, __value), (System.Int32)propInfoValue.GetValue(Context)))));
+
+                // Create an expression to set the ValueExpression-attribute.
+                var constant = System.Linq.Expressions.Expression.Constant(Context, typeof(TItem));
+                var exp = System.Linq.Expressions.MemberExpression.Property(constant, fld);
+                var lamb = System.Linq.Expressions.Expression.Lambda<Func<System.Int32>>(exp);
+
+                builder.AddAttribute(4, "ValueExpression", lamb);
+
+                builder.CloseComponent();
+            };
+
+        public RenderFragment CreateBoolComponent(string fld) => builder =>
+            {
+                builder.OpenComponent(0, typeof(InputCheckbox));
+
+                // Get the initial property value
+                var propInfoValue = typeof(TItem).GetProperty(fld);
+                var s = propInfoValue.GetValue(Context);
+                builder.AddAttribute(1, "Value", s);
+
+                // Create the handler for ValueChanged. I use reflection to the value.
+                builder.AddAttribute(3, "ValueChanged",
+                                RuntimeHelpers.TypeCheck<EventCallback<System.Boolean>>
+                                (EventCallback.Factory.Create<System.Boolean>(this,
+                                EventCallback.Factory.CreateInferred(this,
+                                __value => propInfoValue.SetValue(Context, __value), (System.Boolean)propInfoValue.GetValue(Context)))));
+
+                // Create an expression to set the ValueExpression-attribute.
+                var constant = System.Linq.Expressions.Expression.Constant(Context, typeof(TItem));
+                var exp = System.Linq.Expressions.MemberExpression.Property(constant, fld);
+                var lamb = System.Linq.Expressions.Expression.Lambda<Func<System.Boolean>>(exp);
+
+                builder.AddAttribute(4, "ValueExpression", lamb);
+
+                builder.CloseComponent();
+            };
+        }

@@ -1,0 +1,71 @@
+﻿@page "/Mycases"
+@using System.Data.Entity
+@using Loginnmodels2.Data
+@using Loginnmodels2.DataServices
+@using Loginnmodels2.Pages
+@inject IUserDataService user_service
+@inject ICaseDataService cases_service
+
+<h1>My Cases</h1>
+
+<p>In this component you an select which cases you want work with</p>
+
+<TestComp Context="NuevoCaso" OnClick="@((Case item) => { SaveCaso(item); })" />
+
+
+
+@if (casos == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Case</th>
+                <th>is valid</th>
+                <th>Subscribed</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in casos)
+            {
+                var caso = item.Name;
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.is_valid</td>
+                    <td><input type="checkbox" id="@item.Name" name="casochck" value="@caso" @onchange="(x) => CheckBoxChanged(item, x)"> </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+    
+
+@code {
+    [CascadingParameter(Name = "usr_cases")] List<Data.UserHasCases> usr_cases { get; set; }
+    [CascadingParameter(Name = "loggedin_usr")] Data.User logedin_usr { get; set; }
+
+    private Case NuevoCaso = new Case();
+
+    private List<UserHasCases> usuario_registrado_en = new List<UserHasCases>();
+    private List<Case> casos = new List<Case>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        casos = await cases_service.GetAllCases();
+        usuario_registrado_en = await user_service.GetCases(logedin_usr);
+    }
+
+    void SaveCaso(Case nuevo_caso)
+    {
+        cases_service.Add(nuevo_caso);
+
+    }
+
+    void CheckBoxChanged(Case c, ChangeEventArgs e)
+    {
+        cases_service.ToggleUserInCase(c, logedin_usr);
+    }
+}

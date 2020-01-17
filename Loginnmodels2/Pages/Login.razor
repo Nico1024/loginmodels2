@@ -1,0 +1,26 @@
+﻿@page "/login"
+@using Loginnmodels2.DataServices
+@inject IPageService pageservice
+
+<h1>Login</h1>
+
+<input type="text" @bind="UserName" />
+<input type="password" @bind="UserPwd" />
+
+<button class="btn btn-primary" @onclick="LoginFunction">Login</button>
+
+@code {
+
+    private string UserName;
+    private string UserPwd;
+
+
+    private void LoginFunction()
+    {
+        
+
+    }
+
+
+
+}

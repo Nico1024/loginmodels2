@@ -1,0 +1,51 @@
+﻿@inherits LayoutComponentBase
+@using Loginnmodels2.DataServices
+@using Loginnmodels2.Data
+@inject IUserDataService userservice
+
+
+<BlazoredModal />
+<div class="sidebar">
+    <CascadingValue Value="@loggedin_usr" Name="loggedin_usr">
+        <CascadingValue Value="@usr_cases" Name="usr_cases">
+            <NavMenu />
+        </CascadingValue>
+    </CascadingValue>        
+</div>
+
+<div class="main">
+    <div class="top-row px-4">
+        <LoginDisplay />
+        <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+    </div>
+
+    <div class="content px-4">
+        <CascadingValue Value="@loggedin_usr">
+            <CascadingValue Value="usr_cases">
+                @Body
+            </CascadingValue>
+        </CascadingValue>
+    </div>
+</div>
+
+@code{
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authstatetask { set; get; }
+
+    User loggedin_usr = new User();
+    List<UserHasCases> usr_cases = new List<UserHasCases>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var authstate = await authstatetask;
+            //loggedin_usr =  userservice.Get(authstate.User.Identity.Name).Result;
+            //usr_cases = userservice.GetCases(loggedin_usr).Result;
+        }
+    }
+
+    private List<Case> Casos = new List<Case>();
+
+}

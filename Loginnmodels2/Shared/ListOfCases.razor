@@ -1,0 +1,21 @@
+﻿<AuthorizeView>
+    <Authorized>
+        @foreach (var item in usr_cases)
+        {
+            <a href="model">@item.connected_case</a>
+        }
+        <form method="post" action="Identity/Account/LogOut">
+            <button type="submit" class="nav-link btn btn-link">Logout</button>
+        </form>
+    </Authorized>
+    <NotAuthorized>
+       
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+
+    [CascadingParameter(Name = "usr_cases")] List<Data.UserHasCases> usr_cases { get; set; }
+
+
+}

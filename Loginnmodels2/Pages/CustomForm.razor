@@ -1,0 +1,42 @@
+﻿@page "/customform"
+
+@typeparam TItem
+
+
+<h1>Dynamic Form</h1>
+
+@content
+
+<button class="btn btn-primary" @onclick="asd"> Click me</button>
+
+@* ahora falta procesar con el builder y generr el form*@
+@code {
+
+
+    [Parameter] public TItem generic_object { get; set; }
+    //[Parameter] public string Action { get; set; }
+
+    //private RenderFragment<TItem> form;
+    private string content = "asdasdasdasd";
+
+    
+
+    private void asd()
+    {
+        content = "";
+        var a = generic_object.GetType().GetProperties();
+        foreach (var item in a)
+        {
+            content += item.Name;
+        }
+
+
+        if (generic_object.GetType().ToString() == "System.Int32")
+        {
+            
+        }
+
+    }
+
+
+}
